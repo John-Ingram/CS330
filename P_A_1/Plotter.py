@@ -1,3 +1,4 @@
+#!/opt/python/3.10.4/bin/python3
 # Sources: 
 # CS 330, Python Plotter v2.py
 #

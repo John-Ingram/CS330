@@ -1,3 +1,7 @@
+# John Ingram 2022
+# Written for Mr. Sebastian's CS 330 class
+# Assignment 1
+
 import math
 from Character import Character
 
