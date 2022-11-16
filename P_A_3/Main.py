@@ -36,7 +36,6 @@ class Main:
         Utilities.aStarPrint(graph, 58, 43)
 
 
-
 class Utilities:
     def __init__(self):
         pass
@@ -215,8 +214,6 @@ class PathFindingList:
         for nodeRecord in self.list:
             string += f"{nodeRecord.node.nodeNumber}, "
         return string + "]"
-
-       
 
          
 class NodeRecord:
