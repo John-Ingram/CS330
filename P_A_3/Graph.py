@@ -1,29 +1,31 @@
-
-
-import math
+from operator import attrgetter
 
 
 class Graph:
-        def __init__(self, nodes, rawConnections):
-            self.rawConnections = rawConnections
+        def __init__(self, nodes, connections):
             self.nodes = nodes
-            self.connections = []
-            self.adjacencyList = {}
+            self.connections = connections
+
+            # Add the connections to the nodes
+            for connection in connections:
+                connection.toNode.connections.append(connection)
+                connection.fromNode.connections.append(connection)
 
         # Add a node to the graph
         def addNode(self, node):
             self.nodes.append(node)
-            self.adjacencyList[node] = []
 
-        # Add a connection to the graph
-        def addConnection(self, connection):
-            self.connections.append(connection)
-            self.adjacencyList[connection.node1].append(connection)
-            self.adjacencyList[connection.node2].append(connection)
+        # Get a node's connections
+        def getNodeConnections(self, node):
+            return node.connections
 
         # Get the connections for a given node
-        def getConnections(self, node):
-            return self.adjacencyList[node]
+        def getConnections(self, nodeNumber):
+            node = next((node for node in self.nodes if node.nodeNumber == nodeNumber), None)
+            if node is None:
+                return None
+            else:
+                return node.connections
 
         # Get the nodes in the graph
         def getNodes(self):
@@ -44,7 +46,7 @@ class Graph:
         # Get the node with the given name
         def getNode(self, name):
             for node in self.nodes:
-                if node.name == name:
+                if node.nodeNumber == name:
                     return node
 
             return None
@@ -109,18 +111,7 @@ class Node:
         self.namePlotPosition = namePlotPosition
         self.nodeName = nodeName
         self.connections = []
-
-
-    def getName(self):
-        return self.nodeNumber
-
-    # Get the x coordinate of the node
-    def getX(self):
-        return self.x
-
-    # Get the z coordinate of the node
-    def getZ(self):
-        return self.z
+        self.connection = None
 
     # Get the connections for the node
     def getConnections(self):
@@ -150,31 +141,9 @@ class Node:
     def removeAllConnections(self):
         self.connections = []
 
-    # Get the connection between this node and the given node
-    def getConnection(self, node):
-        for connection in self.connections:
-            if connection.node1 == node or connection.node2 == node:
-                return connection
-
-        return None
-
-    # Get the connection with the given name
-    def getConnectionByName(self, name):
-        for connection in self.connections:
-            if connection.name == name:
-                return connection
-
-        return None
-
     # Get the connection with the given index
     def getConnectionByIndex(self, index):
         return self.connections[index]
-
-    # Get the index of the connection with the given name
-    def getConnectionIndexByName(self, name):
-        for i in range(len(self.connections)):
-            if self.connections[i].name == name:
-                return i
 
     # Get the index of the given connection
     def getConnectionIndex(self, connection):
@@ -195,6 +164,9 @@ class Connection:
         self.costPlotPosition = costPlotPosition
         self.type = type
 
+        self.fromNodeRecord = None
+        self.toNodeRecord = None
+
         self.fromNode = next((node for node in nodes if node.nodeNumber == fromNode), None)
         self.toNode = next((node for node in nodes if node.nodeNumber == toNode), None)
 
@@ -202,17 +174,46 @@ class Connection:
     def getName(self):
         return self.connectionNumber
     
-    # Get the first node of the connection
-    def getNode1(self):
-        return self.node1
-
-    # Get the second node of the connection
-    def getNode2(self):
-        return self.node2
-    
-    # Get the weight of the connection
-    def getWeight(self):
+    # Get the cost of the connection
+    def getCost(self):
         return self.connectionCost
 
     def __str__(self):
         return f"{self.identifier}, {self.connectionNumber}, {self.fromNode.nodeNumber}, {self.toNode.nodeNumber}, {self.connectionCost}, {self.costPlotPosition}, {self.type}"
+
+
+    # The Path class is used to store the path found by the A* algorithm. It has the following fields:
+    # Start node, end node, total cost, list of nodes in the path
+class Path:
+    def __init__(self, startNode, endNode):
+        self.startNode = startNode
+        self.endNode = endNode
+        self.totalCost = 0.0
+        self.nodes = []
+
+    def add(self, node):
+        self.nodes.append(node)
+
+    def smallestElement(self):
+        return min(self.nodes, key=attrgetter())
+
+    # Get the start node of the path
+    def getStartNode(self):
+        return self.startNode
+    
+    # Get the end node of the path
+    def getEndNode(self):
+        return self.endNode
+    
+    # Get the total cost of the path
+    def getTotalCost(self):
+        return self.totalCost
+
+    # Get the list of nodes in the path
+    def getNodes(self):
+        return self.nodes
+    
+    # Reverse the path
+    def reverse(self):
+        self.nodes.reverse()
+    
