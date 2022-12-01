@@ -5,7 +5,6 @@ from enum import Enum
 import random
 
 # Global Variables to keep track of iterations, how many times a state was entered and how many times states were changed in total
-g_iterations = 0
 g_follow = 0
 g_pullOut = 0
 g_accelerate = 0
@@ -97,7 +96,6 @@ def done(scenario):
 
 def run(iterations, scenario):
     # Global variables
-    global g_iterations
     global g_follow
     global g_pullOut
     global g_accelerate
@@ -105,6 +103,7 @@ def run(iterations, scenario):
     global g_pullInBehind
     global g_decelerate
     global g_done
+    global g_path
 
     # list of times each transition was taken
     transitionCounters = [0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -114,7 +113,6 @@ def run(iterations, scenario):
     for i in range(iterations):
         state = State.FOLLOW
         g_path.append([])
-        g_path[i].append(state)
         # If statements to run through the state machine
         while True:
           
@@ -208,6 +206,24 @@ def run(iterations, scenario):
     print("\ntransition frequencies \t\t=", end = "")
     for transition in transitionCounters:
         print(f" {round(transition / sum(transitionCounters), 3)}", end = "")
+
+    # print the path taken
+    if g_path and scenario == 1:
+        for iteration in g_path:
+            print(f"iteration= {g_path.index(iteration)}")
+            for state in iteration:
+                print(f"{state}")
+
+    # reset the global variables
+    g_follow = 0
+    g_pullOut = 0
+    g_accelerate = 0
+    g_pullInAhead = 0
+    g_pullInBehind = 0
+    g_decelerate = 0
+    g_done = 0
+    g_path = []
+
 
 
 # Run the state machine
