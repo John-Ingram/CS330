@@ -30,9 +30,6 @@ transitionProbabilites = [
     [0.8, 0.7],
 ]
 
-# List of global state counters
-stateCounters = [g_follow, g_pullOut, g_accelerate, g_pullInAhead, g_pullInBehind, g_decelerate, g_done]
-
 # Enum class to keep track of states.
 # Each state has a list of possible transitions
 class State(Enum):
@@ -127,7 +124,7 @@ def run(iterations, scenario):
             if state == State.FOLLOW:
                 follow(scenario)
                 # check to see if we transition to pull out
-                if rand < transitionProbabilites[0][scenario - 1]:
+                if rand < [0.8, 0.9][scenario - 1]:
                     state = state.PULL_OUT
                     pullOut(scenario)
                     transitionCounters[0] += 1
@@ -135,44 +132,48 @@ def run(iterations, scenario):
                     continue
             elif state == State.PULL_OUT:
                 # check to see if we transition to accelerate
-                if rand < transitionProbabilites[1][scenario - 1]:
+                if rand < [0.4, 0.6][scenario - 1]:
                     state = state.ACCELERATE
                     accelerate(scenario)
                     transitionCounters[1] += 1
                 # check to see if we transition to pull in behind
-                elif rand < transitionProbabilites[3][scenario - 1]:
+                elif rand < [0.8, 0.8][scenario - 1]:
                     state = state.PULL_IN_BEHIND
                     pull_in_behind(scenario)
                     transitionCounters[3] += 1
                 else:
                     continue
             elif state == State.ACCELERATE:
-                if rand < transitionProbabilites[2][scenario - 1]:
+                if rand < [0.3, 0.3][scenario - 1]:
                     state = state.PULL_IN_AHEAD
                     pull_in_ahead(scenario)
                     transitionCounters[2] += 1
-                elif rand < transitionProbabilites[5][scenario - 1]:
+                elif rand < [0.6, 0.7][scenario - 1]:
                     state = state.DECELERATE
                     decelerate(scenario)
                     transitionCounters[5] += 1
+                elif rand < [0.9, 0.9][scenario - 1]:
+                    state = state.PULL_IN_BEHIND
+                    pull_in_behind(scenario)
+                    transitionCounters[4] += 1
                 else:
                     continue
             elif state == State.PULL_IN_BEHIND:
-                if rand < transitionProbabilites[6][scenario - 1]:
+                if rand < [0.8, 0.7][scenario - 1]:
                     state = state.FOLLOW
                     follow(scenario)
                     transitionCounters[6] += 1
                 else:
                     continue
             elif state == State.DECELERATE:
-                if rand < transitionProbabilites[7][scenario - 1]:
+                if rand < [0.8, 0.9][scenario - 1]:
                     state = state.PULL_IN_BEHIND
                     pull_in_behind(scenario)
                     transitionCounters[7] += 1
                 else:
                     continue
             elif state == State.PULL_IN_AHEAD:
-                if rand < transitionProbabilites[8][scenario - 1]:
+                if rand < [0.8, 0.7][scenario - 1]:
                     state = state.DONE
                     done(scenario)
                     transitionCounters[8] += 1
@@ -180,8 +181,11 @@ def run(iterations, scenario):
                 else:
                     continue
 
+    # List of global state counters
+    stateCounters = [g_follow, g_pullOut, g_accelerate, g_pullInAhead, g_pullInBehind, g_decelerate, g_done]
+
     # Print out the number of times each state was entered
-    print(f"scenario \t\t\t= {scenario}")
+    print(f"\nscenario \t\t\t= {scenario}")
     print(f"trace \t\t\t\t= {bool(g_path)}")
     print(f"iterations \t\t\t= {iterations}")
     # print the transition probabilities used 
@@ -195,7 +199,7 @@ def run(iterations, scenario):
     # print the state frequencies
     print("\nstate frequencies \t\t=", end = "")
     for stateCounter in stateCounters:
-        print(f" {stateCounter / iterations}", end = "")
+        print(f" {round(stateCounter / sum(stateCounters), 3)}", end = "")
     # print the number of times each transition was taken
     print("\ntransition counts \t\t=", end = "")
     for transition in transitionCounters:
@@ -203,10 +207,10 @@ def run(iterations, scenario):
     # print the transition frequencies
     print("\ntransition frequencies \t\t=", end = "")
     for transition in transitionCounters:
-        print(f" {transition / sum(transitionCounters)}", end = "")
+        print(f" {round(transition / sum(transitionCounters), 3)}", end = "")
 
 
 # Run the state machine
 run(100, 1)
-#run(1000000, 2)
+run(1000000, 2)
     
